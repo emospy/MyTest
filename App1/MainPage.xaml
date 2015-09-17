@@ -6,17 +6,27 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Loaded="Page_Loaded">
-
+    Loaded="Page_Loaded" FontSize="12">
 
     <Grid Name="Grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>            
         </Grid.RowDefinitions>
-        <StackPanel Name="spStats" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBlock Name="txtBlock"/>
-        <StackPanel Name="spButtons" Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <StackPanel Name="spStats" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Orientation="Vertical">                
+                <TextBlock Name="txtBlock" TextWrapping="WrapWholeWords" Padding="10" MaxWidth="600" FontSize="12"/>
+                <StackPanel Name="spButtons" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Popup x:Name="StandardPopup" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
+                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                BorderThickness="2">
+                <Grid Name="pGrid">                    
+                </Grid>
+            </Border>
+        </Popup>
     </Grid>
 </Page>

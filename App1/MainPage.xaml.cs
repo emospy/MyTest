@@ -65,26 +65,6 @@ namespace App1
             }
 
             this.ExecuteEpizode(this.Game.CurrentEpizode);
-
-            //XmlSerializer serializer = new XmlSerializer(typeof(Game));
-
-            //StorageFolder installFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-
-            //StorageFile file = await StorageFile.GetFileFromApplicationUriAsync("ms-appx:///file.txt");
-
-            //this.GameSource = (Game)serializer.Deserialize(file);
-            //fs.Close();
-
-            //Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
-
-            //this.Game = new SaveGameData();
-            //this.isLoadedGame = this.LoadGame("Autosave.xml");
-            //if (isLoadedGame == false)
-            //{
-            //    this.InitializeGame();
-            //}
-
-            //this.ExecuteEpizode(this.Game.CurrentEpizode);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -170,8 +150,12 @@ namespace App1
             foreach (var s in this.Game.lstStats)
             {
                 this.spStats.Children.Add(new TextBlock { Text = s.Name });
-                this.spStats.Children.Add(new TextBlock { Text = s.Value.ToString() });
+                this.spStats.Children.Add(new TextBlock { Text = s.Value.ToString() });                
             }
+            Button bPop = new Button();
+            bPop.Content = "Stats";
+            bPop.Tapped += this.GameInfo_Click;
+            this.spStats.Children.Add(bPop);
         }
 
         private void ResetStat(string name, int qty)
@@ -443,7 +427,7 @@ namespace App1
             Button btn = new Button();
             btn.Tapped += this.BTapped;
             btn.Content = chance.Text;
-            btn.Tag = chance.GoTo;
+            btn.Tag = chance.GoTo;            
             this.spButtons.Children.Add(btn);
         }
 
@@ -460,15 +444,8 @@ namespace App1
         }
 
         private void PrepareText(EpizodeXML epizode)
-        {
-            //var EpizodeContents = new FlowDocumentScrollViewer();
-            //var Flowdoc = new FlowDocument();
-            //Paragraph para = new Paragraph();
-            //para.Inlines.Add(epizode.ID + "\n" + epizode.Text);
-            //Flowdoc.Blocks.Add(para);
-            ////this.txtEpizodeContents = new FlowDocumentScrollViewer();
-            //this.txtEpizodeContents.Document = Flowdoc;
-            //this.txtEpizodeContents
+        {            
+            this.txtBlock.Text = epizode.ID + "\n" + epizode.Text;            
         }
 
         private void PrepareBattle(EpizodeXML epizode)
@@ -544,45 +521,61 @@ namespace App1
             //this.Close();
         }
 
-        private void GameInfo_Click_1(object sender, RoutedEventArgs e)
+        private void GameInfo_Click(object sender, TappedRoutedEventArgs e)
         {
             //Window win = new Window();
-            //var Grid = new Grid();
-            //Grid.ColumnDefinitions.Add(new ColumnDefinition());
-            //Grid.ColumnDefinitions.Add(new ColumnDefinition());
-            //int row = 0;
-            //foreach (var stat in this.Game.lstStats)
-            //{
-            //    Grid.RowDefinitions.Add(new RowDefinition());
-            //    var label = new Label { Content = stat.Name, HorizontalAlignment = System.Windows.HorizontalAlignment.Right };
-            //    Grid.Children.Add(label);
-            //    Grid.SetRow(label, row);
-            //    Grid.SetColumn(label, 0);
+            pGrid.Children.Clear();
+            pGrid.RowDefinitions.Clear();
+            pGrid.ColumnDefinitions.Clear();
+            pGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            pGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            int row = 0;
+            foreach (var stat in this.Game.lstStats)
+            {
+                pGrid.RowDefinitions.Add(new RowDefinition());
+                var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
+                pGrid.Children.Add(label);
+                Grid.SetRow(label, row);
+                Grid.SetColumn(label, 0);
 
-            //    var val = new Label { Content = stat.Value, HorizontalAlignment = System.Windows.HorizontalAlignment.Left };
-            //    Grid.Children.Add(val);
-            //    Grid.SetRow(val, row);
-            //    Grid.SetColumn(val, 1);
-            //    row++;
-            //}
+                var val = new TextBlock { Text = stat.Value.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
+                pGrid.Children.Add(val);
+                Grid.SetRow(val, row);
+                Grid.SetColumn(val, 1);
+                row++;
+            }
 
-            //foreach (var stat in this.Game.lstInventory)
-            //{
-            //    Grid.RowDefinitions.Add(new RowDefinition());
-            //    var label = new Label { Content = stat.Name, HorizontalAlignment = System.Windows.HorizontalAlignment.Right };
-            //    Grid.Children.Add(label);
-            //    Grid.SetRow(label, row);
-            //    Grid.SetColumn(label, 0);
+            foreach (var stat in this.Game.lstInventory)
+            {
+                pGrid.RowDefinitions.Add(new RowDefinition());
+                var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
+                pGrid.Children.Add(label);
+                Grid.SetRow(label, row);
+                Grid.SetColumn(label, 0);
 
-            //    var val = new Label { Content = stat.Quantity, HorizontalAlignment = System.Windows.HorizontalAlignment.Left };
-            //    Grid.Children.Add(val);
-            //    Grid.SetRow(val, row);
-            //    Grid.SetColumn(val, 1);
-            //    row++;
-            //}
-            //win.Content = Grid;
-            //win.SizeToContent = System.Windows.SizeToContent.WidthAndHeight;
-            //win.ShowDialog();
+                var val = new TextBlock { Text = stat.Quantity.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
+                pGrid.Children.Add(val);
+                Grid.SetRow(val, row);
+                Grid.SetColumn(val, 1);
+                row++;
+            }
+
+            pGrid.RowDefinitions.Add(new RowDefinition());
+            Button btnClose = new Button();
+            btnClose.Tapped += this.ClosePopup;
+            btnClose.Content = "Затвори";
+            btnClose.HorizontalAlignment = HorizontalAlignment.Center;
+            pGrid.Children.Add(btnClose);
+            Grid.SetRow(btnClose, row);
+            Grid.SetColumnSpan(btnClose, 2);
+            Grid.SetColumn(btnClose, 0);
+
+            this.StandardPopup.IsOpen = true;
+        }
+
+        public void ClosePopup(object sender, TappedRoutedEventArgs e)
+        {
+            if (StandardPopup.IsOpen) { StandardPopup.IsOpen = false; }
         }
 
         private void NewGame_Click_1(object sender, RoutedEventArgs e)
@@ -590,8 +583,6 @@ namespace App1
             this.InitializeGame();
             this.ExecuteEpizode(this.Game.CurrentEpizode);
         }
-
-        
     }
 
     [XmlRoot("SaveGameData")]
