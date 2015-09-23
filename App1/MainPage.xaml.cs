@@ -583,6 +583,30 @@ namespace App1
             this.InitializeGame();
             this.ExecuteEpizode(this.Game.CurrentEpizode);
         }
+
+        private void MainPage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _isDragging = true;
+        }
+
+        private void MainPage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isDragging = false;
+        }
+
+        private void MainPage_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_isDragging)
+                return;
+
+            if (!SearchPopup.IsOpen)
+                SearchPopup.IsOpen = true;
+
+            Point position = e.GetPosition(null);
+
+            SearchPopup.HorizontalOffset = position.X;
+            SearchPopup.VerticalOffset = position.Y;
+        }
     }
 
     [XmlRoot("SaveGameData")]
