@@ -7,12 +7,14 @@ using System.Xml.Serialization;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 
@@ -51,8 +53,9 @@ namespace App1
         private async void LoadXML()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Game));
-            StorageFolder folder = ApplicationData.Current.LocalFolder;
-            StorageFile file = await folder.GetFileAsync("game.xml");
+
+            StorageFolder folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            StorageFile file = await folder.GetFileAsync(@"Assets\game.xml");
             Stream stream = await file.OpenStreamForReadAsync();
             this.GameSource = (Game)serializer.Deserialize(stream);
             stream.Dispose();
@@ -72,13 +75,40 @@ namespace App1
             this.LoadXML();
         }
 
+        public BitmapImage Convert(byte[] value)
+        {
+            if (value == null )
+                return null;
+
+            using (InMemoryRandomAccessStream ms = new InMemoryRandomAccessStream())
+            {
+                // Writes the image byte array in an InMemoryRandomAccessStream
+                // that is needed to set the source of BitmapImage.
+                using (DataWriter writer = new DataWriter(ms.GetOutputStreamAt(0)))
+                {
+                    writer.WriteBytes((byte[])value);
+
+                    // The GetResults here forces to wait until the operation completes
+                    // (i.e., it is executed synchronously), so this call can block the UI.
+                    writer.StoreAsync().GetResults();
+                }
+
+                var image = new BitmapImage();
+                image.SetSource(ms);
+                return image;
+            }
+        }
+
         private void ExecuteEpizode(int EpizodeNumber)
         {
+
             var epizode = GetEpizode(EpizodeNumber);
             if (epizode == null)
             {
                 return;
             }
+
+            var image = Convert(epizode.image);
 
             if (this.isLoadedGame == false)
             {
@@ -89,6 +119,8 @@ namespace App1
 
             this.Game.CurrentEpizode = EpizodeNumber;
 
+
+            this.imgBox.Source = image;
             this.PrepareText(epizode);
 
             if (CheckIfDead())
@@ -152,10 +184,10 @@ namespace App1
                 this.spStats.Children.Add(new TextBlock { Text = s.Name });
                 this.spStats.Children.Add(new TextBlock { Text = s.Value.ToString() });                
             }
-            Button bPop = new Button();
-            bPop.Content = "Stats";
-            bPop.Tapped += this.GameInfo_Click;
-            this.spStats.Children.Add(bPop);
+            //Button bPop = new Button();
+            //bPop.Content = "Stats";
+            //bPop.Tapped += this.GameInfo_Click;
+            //this.spStats.Children.Add(bPop);
         }
 
         private void ResetStat(string name, int qty)
@@ -418,7 +450,6 @@ namespace App1
                 MyHealth.Value = health;
                 btn.Tag = battle.Lose;
             }
-
             this.spButtons.Children.Add(btn);
         }
 
@@ -521,62 +552,62 @@ namespace App1
             //this.Close();
         }
 
-        private void GameInfo_Click(object sender, TappedRoutedEventArgs e)
-        {
-            //Window win = new Window();
-            pGrid.Children.Clear();
-            pGrid.RowDefinitions.Clear();
-            pGrid.ColumnDefinitions.Clear();
-            pGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            pGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            int row = 0;
-            foreach (var stat in this.Game.lstStats)
-            {
-                pGrid.RowDefinitions.Add(new RowDefinition());
-                var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
-                pGrid.Children.Add(label);
-                Grid.SetRow(label, row);
-                Grid.SetColumn(label, 0);
+        //private void GameInfo_Click(object sender, TappedRoutedEventArgs e)
+        //{
+        //    //Window win = new Window();
+        //    pGrid.Children.Clear();
+        //    pGrid.RowDefinitions.Clear();
+        //    pGrid.ColumnDefinitions.Clear();
+        //    pGrid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    pGrid.ColumnDefinitions.Add(new ColumnDefinition());
+        //    int row = 0;
+        //    foreach (var stat in this.Game.lstStats)
+        //    {
+        //        pGrid.RowDefinitions.Add(new RowDefinition());
+        //        var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
+        //        pGrid.Children.Add(label);
+        //        Grid.SetRow(label, row);
+        //        Grid.SetColumn(label, 0);
 
-                var val = new TextBlock { Text = stat.Value.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
-                pGrid.Children.Add(val);
-                Grid.SetRow(val, row);
-                Grid.SetColumn(val, 1);
-                row++;
-            }
+        //        var val = new TextBlock { Text = stat.Value.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
+        //        pGrid.Children.Add(val);
+        //        Grid.SetRow(val, row);
+        //        Grid.SetColumn(val, 1);
+        //        row++;
+        //    }
 
-            foreach (var stat in this.Game.lstInventory)
-            {
-                pGrid.RowDefinitions.Add(new RowDefinition());
-                var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
-                pGrid.Children.Add(label);
-                Grid.SetRow(label, row);
-                Grid.SetColumn(label, 0);
+        //    foreach (var stat in this.Game.lstInventory)
+        //    {
+        //        pGrid.RowDefinitions.Add(new RowDefinition());
+        //        var label = new TextBlock { Text = stat.Name, HorizontalAlignment = HorizontalAlignment.Left };
+        //        pGrid.Children.Add(label);
+        //        Grid.SetRow(label, row);
+        //        Grid.SetColumn(label, 0);
 
-                var val = new TextBlock { Text = stat.Quantity.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
-                pGrid.Children.Add(val);
-                Grid.SetRow(val, row);
-                Grid.SetColumn(val, 1);
-                row++;
-            }
+        //        var val = new TextBlock { Text = stat.Quantity.ToString(), HorizontalAlignment = HorizontalAlignment.Right };
+        //        pGrid.Children.Add(val);
+        //        Grid.SetRow(val, row);
+        //        Grid.SetColumn(val, 1);
+        //        row++;
+        //    }
 
-            pGrid.RowDefinitions.Add(new RowDefinition());
-            Button btnClose = new Button();
-            btnClose.Tapped += this.ClosePopup;
-            btnClose.Content = "Затвори";
-            btnClose.HorizontalAlignment = HorizontalAlignment.Center;
-            pGrid.Children.Add(btnClose);
-            Grid.SetRow(btnClose, row);
-            Grid.SetColumnSpan(btnClose, 2);
-            Grid.SetColumn(btnClose, 0);
+        //    pGrid.RowDefinitions.Add(new RowDefinition());
+        //    Button btnClose = new Button();
+        //    btnClose.Tapped += this.ClosePopup;
+        //    btnClose.Content = "Затвори";
+        //    btnClose.HorizontalAlignment = HorizontalAlignment.Center;
+        //    pGrid.Children.Add(btnClose);
+        //    Grid.SetRow(btnClose, row);
+        //    Grid.SetColumnSpan(btnClose, 2);
+        //    Grid.SetColumn(btnClose, 0);
 
-            this.StandardPopup.IsOpen = true;
-        }
+        //    this.StandardPopup.IsOpen = true;
+        //}
 
-        public void ClosePopup(object sender, TappedRoutedEventArgs e)
-        {
-            if (StandardPopup.IsOpen) { StandardPopup.IsOpen = false; }
-        }
+        //public void ClosePopup(object sender, TappedRoutedEventArgs e)
+        //{
+        //    if (StandardPopup.IsOpen) { StandardPopup.IsOpen = false; }
+        //}
 
         private void NewGame_Click_1(object sender, RoutedEventArgs e)
         {

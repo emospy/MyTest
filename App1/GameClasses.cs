@@ -34,7 +34,8 @@ namespace App1
 		public List<Skill> Skills;
 		public List<Stat> Stats;
 		public Choices Choices;
-	}
+        public Byte[] image;
+    }
 
 	[XmlRoot("Epizode")]
 	public class Epizode

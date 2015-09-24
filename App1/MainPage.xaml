@@ -15,18 +15,11 @@
         </Grid.RowDefinitions>
         <StackPanel Name="spStats" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
         <ScrollViewer Grid.Row="1">
-            <StackPanel Orientation="Vertical">                
-                <TextBlock Name="txtBlock" TextWrapping="WrapWholeWords" Padding="10" MaxWidth="600" FontSize="12"/>
+            <StackPanel Orientation="Vertical">
+                <Image Name="imgBox" MaxWidth="600"/>
+                <TextBlock Name="txtBlock" TextWrapping="WrapWholeWords" Padding="10" MaxWidth="600" FontSize="16"/>
                 <StackPanel Name="spButtons" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </StackPanel>
         </ScrollViewer>
-        <Popup x:Name="StandardPopup" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Border BorderBrush="{StaticResource ApplicationForegroundThemeBrush}" 
-                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
-                BorderThickness="2">
-                <Grid Name="pGrid">                    
-                </Grid>
-            </Border>
-        </Popup>
     </Grid>
 </Page>
